@@ -1,49 +1,178 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="utf-8" />
-        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <title>Micro Livraria</title>
-        <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" />
-        <link rel="stylesheet" href="https://unpkg.com/bulma@0.9.0/css/bulma.min.css" />
-        <link rel="stylesheet" type="text/css" href="index.css" />
-        <link rel="stylesheet" href="https://unpkg.com/bulma-modal-fx/dist/css/modal-fx.min.css" />
-    </head>
-    <body>
-        <section class="hero is-info is-small">
-            
-        <div class="box">
-    <div class="field has-addons has-addons-centered">
-        <div class="control">
-            <input id="searchInput" class="input" type="text" placeholder="Digite o nome do livro">
+<html lang="pt-br">
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Micro Livraria - Pesquisa</title>
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" />
+    <!-- Bulma CSS para estilização rápida e profissional -->
+    <link rel="stylesheet" href="https://unpkg.com/bulma@0.9.0/css/bulma.min.css" />
+    <style>
+        html, body {
+            background: #eff3f4;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        }
+        .hero-body .container {
+            max-width: 700px;
+        }
+        .hero-body .title {
+            color: hsl(192, 17%, 99%) !important;
+        }
+        .hero-body .subtitle {
+            color: hsl(192, 17%, 99%) !important;
+            padding-top: 2rem;
+            line-height: 1.5;
+        }
+        .search-container {
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 3px rgba(10, 10, 10, 0.1);
+            margin-bottom: 20px;
+        }
+        .book-card {
+            margin-top: 20px;
+            transition: transform 0.3s;
+        }
+        .book-card:hover {
+            transform: translateY(-5px);
+        }
+        #resultArea {
+            margin-top: 30px;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <section class="hero is-info is-small">
+        <div class="hero-body">
+            <div class="container has-text-centered">
+                <p class="title">Micro Livraria</p>
+                <p class="subtitle">Pesquise seus livros favoritos</p>
+            </div>
         </div>
-        <div class="control">
-            <button id="searchButton" class="button is-info">
-                Pesquisar Livro
-            </button>
-        </div>
-    </div>
-</div>
-            <div class="hero-body">
-                <div class="container has-text-centered">
-                    <p class="title">Micro Livraria</p>
+    </section>
+
+    <div class="container">
+        <div class="section">
+            <div class="search-container">
+                <div class="field has-addons has-addons-centered">
+                    <div class="control is-expanded">
+                        <input id="searchInput" class="input is-medium" type="text" placeholder="Digite o ID do livro (ex: 1, 2, 3)" />
+                    </div>
+                    <div class="control">
+                        <button id="searchButton" class="button is-info is-medium">
+                            Pesquisar Livro
+                        </button>
+                    </div>
+                </div>
+                <p class="help has-text-centered">A função utiliza a lógica de busca por ID do arquivo index.js do Inventory.</p>
+            </div>
+
+            <div id="resultArea" class="columns is-centered">
+                <!-- O resultado da pesquisa aparecerá aqui -->
+                <div id="noResult" class="column is-6 has-text-centered">
+                    <p class="has-text-grey">Nenhum livro pesquisado ainda.</p>
                 </div>
             </div>
-        </section>
-        <div class="box cta">
-            <p class="has-text-centered">Uma simples livraria utilizando microservices</p>
         </div>
-        <section class="container">
-            <div class="columns books"></div>
-        </section>
+    </div>
 
-        <footer class="footer has-text-centered">Feito com ❤️ na UFMG</footer>
+    <script>
+        // Simulação dos dados que estariam no products.json do backend
+        const products = [
+            {
+                "id": 1,
+                "name": "Engenharia de Software Moderna",
+                "author": "Marco Tulio Valente",
+                "price": 100.0,
+                "photo": "https://engsoftmoderna.info/figs/capa-livro.png"
+            },
+            {
+                "id": 2,
+                "name": "Clean Code",
+                "author": "Robert C. Martin",
+                "price": 85.0,
+                "photo": "https://m.media-amazon.com/images/I/41SH-91ut6L._SX356_BO1,204,203,200_.jpg"
+            },
+            {
+                "id": 3,
+                "name": "Design Patterns",
+                "author": "Erich Gamma",
+                "price": 120.0,
+                "photo": "https://m.media-amazon.com/images/I/51szD9HC9pL._SX395_BO1,204,203,200_.jpg"
+            }
+        ];
 
-        <script src="https://unpkg.com/bulma-modal-fx/dist/js/modal-fx.min.js"></script>
-        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/overlayscrollbars/1.9.1/js/OverlayScrollbars.min.js"></script>
-        <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
-        <script src="index.js"></script>
-    </body>
+        // Função que ativa a lógica do arquivo index.js (SearchProductByID)
+        function searchProduct() {
+            const input = document.getElementById("searchInput");
+            const term = input.value.trim();
+            const resultArea = document.getElementById("resultArea");
+
+            if (term === "") {
+                alert("Por favor, digite um ID para pesquisar.");
+                return;
+            }
+
+            // Lógica extraída do index.js do Inventory:
+            // products.find((product) => product.id == payload.request.id)
+            const foundProduct = products.find(p => p.id == term);
+
+            if (foundProduct) {
+                renderProduct(foundProduct);
+            } else {
+                resultArea.innerHTML = `
+                    <div class="column is-6 has-text-centered">
+                        <div class="notification is-warning">
+                            Livro com ID <strong>${term}</strong> não encontrado no estoque.
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        function renderProduct(book) {
+            const resultArea = document.getElementById("resultArea");
+            resultArea.innerHTML = `
+                <div class="column is-4">
+                    <div class="card book-card">
+                        <div class="card-image">
+                            <figure class="image is-4by3">
+                                <img src="${book.photo}" alt="${book.name}" style="object-fit: contain; padding: 10px;">
+                            </figure>
+                        </div>
+                        <div class="card-content">
+                            <div class="media">
+                                <div class="media-content">
+                                    <p class="title is-4">${book.name}</p>
+                                    <p class="subtitle is-6">Por: ${book.author}</p>
+                                </div>
+                            </div>
+                            <div class="content">
+                                <span class="tag is-success is-large">R$ ${book.price.toFixed(2)}</span>
+                                <br><br>
+                                <p>ID do Produto: <strong>${book.id}</strong></p>
+                                <button class="button is-primary is-fullwidth">Comprar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Adiciona o evento ao botão conforme solicitado
+        document.getElementById("searchButton").addEventListener("click", searchProduct);
+
+        // Permite pesquisar ao apertar Enter
+        document.getElementById("searchInput").addEventListener("keypress", function(e) {
+            if (e.key === 'Enter') {
+                searchProduct();
+            }
+        });
+    </script>
+</body>
 </html>
